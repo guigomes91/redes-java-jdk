@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>redes-jdk · Documentação</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <h1>redes-jdk</h1>
+  <p>Estudos de programação de redes com as APIs nativas do JDK: sockets, NIO, TCP, UDP, multicast e o Simple Web Server.</p>
+  <nav>
+    <a href="#visao-geral">Visão geral</a>
+    <a href="#exemplos">Exemplos</a>
+    <a href="#portas">Portas</a>
+    <a href="#sws">Simple Web Server</a>
+    <a href="#executar">Como executar</a>
+  </nav>
+</header>
+
+<main>
+
+  <section id="visao-geral">
+    <h2>Visão geral</h2>
+    <p>
+      Cada classe do projeto é um exemplo autocontido, com seu próprio <code>main</code>.
+      Nenhuma dependência externa: tudo usa <code>java.net</code>, <code>java.nio.channels</code>
+      e <code>com.sun.net.httpserver</code>, que já vêm no JDK.
+    </p>
+    <p>
+      <span class="tag">JDK 18+</span> obrigatório para o Simple Web Server (JEP 408).
+      Os demais exemplos rodam em versões anteriores.
+    </p>
+  </section>
+
+  <section id="exemplos">
+    <h2>Exemplos</h2>
+
+    <h3>Fundamentos</h3>
+    <div class="cards">
+      <article class="card">
+        <h3>SocketBasicsIntro</h3>
+        <div class="pkg">caramelo.dev</div>
+        <p>Usa <code>InetAddress</code> para o localhost e o loopback <code>127.0.0.1</code>, e cria um endpoint com <code>InetSocketAddress</code> (IP + porta).</p>
+      </article>
+      <article class="card">
+        <h3>ExploringNetworkInterfaces</h3>
+        <div class="pkg">caramelo.dev</div>
+        <p>Lista as interfaces de rede da máquina com <code>NetworkInterface</code>: propriedades (up, loopback, MTU…) e os endereços IP de cada uma.</p>
+      </article>
+      <article class="card">
+        <h3>SocketApiOptionsIntro</h3>
+        <div class="pkg">caramelo.dev</div>
+        <p>Inspeciona e configura <code>StandardSocketOptions</code> em <code>ServerSocketChannel</code> e <code>SocketChannel</code>. Os tamanhos de buffer são só uma dica: o SO pode ajustá-los.</p>
+      </article>
+    </div>
+
+    <h3>TCP</h3>
+    <div class="cards">
+      <article class="card">
+        <h3>WritingBlockingTcpServerClient</h3>
+        <div class="pkg">caramelo.dev</div>
+        <p>Servidor e cliente TCP bloqueantes com <code>SocketChannel</code>. Uma requisição por conexão: o cliente usa <code>shutdownOutput()</code> e o servidor lê até o EOF. Sincroniza com <code>CountDownLatch</code>.</p>
+      </article>
+      <article class="card">
+        <h3>NonBlockingTcpServerClient</h3>
+        <div class="pkg">caramelo.dev</div>
+        <p>Servidor eco não bloqueante com <code>Selector</code>, tratando <code>OP_ACCEPT</code>, <code>OP_READ</code> e <code>OP_CONNECT</code> numa única thread.</p>
+      </article>
+      <article class="card">
+        <h3>TcpServers</h3>
+        <div class="pkg">caramelo.dev</div>
+        <p>Compara os dois modelos lado a lado: bloqueante (uma thread por cliente) e não bloqueante (uma thread, um <code>Selector</code>, muitas conexões).</p>
+      </article>
+    </div>
+
+    <h3>UDP e Multicast</h3>
+    <div class="cards">
+      <article class="card">
+        <h3>WritingUdpServerClient</h3>
+        <div class="pkg">caramelo.dev.udp</div>
+        <p>Servidor UDP eco com <code>DatagramChannel</code> e dois clientes: sem conexão (<code>send</code>/<code>receive</code>) e com conexão (<code>connect</code> + <code>write</code>/<code>read</code>).</p>
+      </article>
+      <article class="card">
+        <h3>IntroducingMulticasting</h3>
+        <div class="pkg">caramelo.dev.udp</div>
+        <p>Entra no grupo <code>225.4.5.6</code> com <code>join()</code>, inspeciona o <code>MembershipKey</code> e sai com <code>drop()</code>.</p>
+      </article>
+    </div>
+
+    <h3>HTTP</h3>
+    <div class="cards">
+      <article class="card">
+        <h3>SimpleWebServerIntro</h3>
+        <div class="pkg">caramelo.dev.sws</div>
+        <p>Sobe um servidor de arquivos estáticos com <code>SimpleFileServer</code> e serve a pasta <code>./docs</code>, onde está esta página.</p>
+      </article>
+    </div>
+  </section>
+
+  <section id="portas">
+    <h2>Portas usadas</h2>
+    <p>Dois exemplos que usam a mesma porta não podem rodar ao mesmo tempo.</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Porta</th><th>Protocolo</th><th>Classe</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>4444</code></td><td>TCP</td><td>NonBlockingTcpServerClient</td></tr>
+          <tr><td><code>4444</code></td><td>UDP</td><td>WritingUdpServerClient</td></tr>
+          <tr><td><code>4444</code></td><td>UDP multicast</td><td>IntroducingMulticasting</td></tr>
+          <tr><td><code>8080</code></td><td>TCP</td><td>TcpServers (bloqueante)</td></tr>
+          <tr><td><code>8081</code></td><td>TCP</td><td>TcpServers (não bloqueante)</td></tr>
+          <tr><td><code>8080</code></td><td>HTTP</td><td>SimpleWebServerIntro</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="sws">
+    <h2>Simple Web Server (JEP 408)</h2>
+    <p>
+      Desde o JDK 18, o pacote <code>com.sun.net.httpserver</code> traz o <code>SimpleFileServer</code>:
+      um servidor HTTP mínimo que só serve arquivos estáticos via <code>GET</code> e <code>HEAD</code>.
+      Serve para protótipos, testes e para compartilhar arquivos na rede local. Não use em produção.
+    </p>
+    <pre><code>HttpServer server = SimpleFileServer.createFileServer(
+        new InetSocketAddress(8080),
+        Path.of("./docs").toAbsolutePath(),   // precisa ser absoluto
+        SimpleFileServer.OutputLevel.VERBOSE);
+server.start();</code></pre>
+    <ul>
+      <li>O diretório precisa ser um caminho <strong>absoluto</strong>, senão é lançada <code>IllegalArgumentException</code>.</li>
+      <li>Requisições para <code>/</code> devolvem o <code>index.html</code> do diretório. Sem ele, o servidor gera uma listagem.</li>
+      <li>O <code>Content-Type</code> é deduzido pela extensão (esta página carrega <code>style.css</code> como <code>text/css</code>).</li>
+      <li><code>OutputLevel.VERBOSE</code> imprime cada requisição com cabeçalhos no console.</li>
+    </ul>
+    <p>A mesma coisa pela linha de comando, sem escrever código:</p>
+    <pre><code>jwebserver -d C:\dev\git\backend\redes-jdk\docs -p 8080</code></pre>
+  </section>
+
+  <section id="executar">
+    <h2>Como executar</h2>
+    <p>Pela IDE, rode o <code>main</code> da classe desejada. O caminho <code>./docs</code> é resolvido a partir do diretório de trabalho, que precisa ser a raiz do projeto.</p>
+    <p>Pelo terminal, na raiz do projeto:</p>
+    <pre><code>javac -d out src/caramelo/dev/sws/SimpleWebServerIntro.java
+java -cp out caramelo.dev.sws.SimpleWebServerIntro</code></pre>
+    <p>Depois, abra <a href="http://localhost:8080/">http://localhost:8080/</a>.</p>
+  </section>
+
+</main>
+
+<footer>
+  getcaramelo.dev · redes-jdk · página servida pelo Simple Web Server do JDK
+</footer>
+
+</body>
+</html>
