@@ -5,6 +5,7 @@ import com.sun.net.httpserver.SimpleFileServer;
 
 import java.net.InetSocketAddress;
 import java.nio.file.Path;
+import java.util.concurrent.Executors;
 
 public class SimpleWebServerIntro {
 
@@ -14,14 +15,16 @@ public class SimpleWebServerIntro {
     public static void main(String[] args) {
         System.out.println("--- Criando o Simple Web Server (JDK 18+ / JEP 408) ---");
 
-        // 1 - Cria a instância do servidor web de arquivos estáticos
+        // Cria a instância do servidor web de arquivos estáticos
         HttpServer server = SimpleFileServer.createFileServer(
                 new InetSocketAddress(PORT), // Endereço e porta de escuta
                 DIRECTORY_TO_SERVE, // Diretório raiz a ser servido
                 SimpleFileServer.OutputLevel.VERBOSE // Nível de log no console (VERBOSE)
         );
 
-        // 2 - Inicializa o servidor web
+        server.setExecutor(Executors.newVirtualThreadPerTaskExecutor());
+
+        // Inicializa o servidor web
         server.start();
 
         System.out.println("[OK] Simple Web Server iniciado com sucesso!");
