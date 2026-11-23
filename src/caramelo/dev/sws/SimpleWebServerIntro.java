@@ -34,7 +34,6 @@ public class SimpleWebServerIntro {
         );
 
         Filter logFilter = SimpleFileServer.createOutputFilter(logStream, SimpleFileServer.OutputLevel.VERBOSE);
-
         // Cria a instância do servidor web de arquivos estáticos
         HttpServer server = HttpServer.create(
                 new InetSocketAddress(PORT), // Endereço e porta de escuta
@@ -45,7 +44,6 @@ public class SimpleWebServerIntro {
         );
 
         server.setExecutor(Executors.newVirtualThreadPerTaskExecutor());
-
         // Inicializa o servidor web
         server.start();
 

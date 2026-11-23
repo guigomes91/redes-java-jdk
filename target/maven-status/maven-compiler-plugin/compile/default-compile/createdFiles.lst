@@ -1,0 +1,11 @@
+Main.class
+caramelo\dev\udp\WritingUdpServerClient.class
+caramelo\dev\SocketBasicsIntro.class
+caramelo\dev\udp\IntroducingMulticasting.class
+caramelo\dev\sws\SimpleWebServerIntro.class
+caramelo\dev\TcpServers.class
+caramelo\dev\ExploringNetworkInterfaces.class
+caramelo\dev\sws\SwsInMemoryFileSystem.class
+caramelo\dev\WritingBlockingTcpServerClient.class
+caramelo\dev\SocketApiOptionsIntro.class
+caramelo\dev\NonBlockingTcpServerClient.class
