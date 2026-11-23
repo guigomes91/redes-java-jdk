@@ -21,7 +21,7 @@ public class SwsInMemoryFileSystem {
     private static final int PORT = 9009;
 
     public static void main(String[] args) throws IOException {
-        Path inMemoryPath = criarDiretorioEmMemoria();
+        Path inMemoryPath = criarBucketEmMemoria();
 
         HttpServer server = SimpleFileServer.createFileServer(
                 new InetSocketAddress(PORT),
@@ -38,20 +38,21 @@ public class SwsInMemoryFileSystem {
         System.out.println(" • Caminho virtual: " + inMemoryPath);
     }
 
-    private static Path criarDiretorioEmMemoria() throws IOException {
-        // O FileSystem não é fechado de propósito: ele precisa viver enquanto o servidor estiver no ar
+    private static Path criarBucketEmMemoria() throws IOException {
         FileSystem fileSystem = Jimfs.newFileSystem(Configuration.forCurrentPlatform());
+        Path bucket = Files.createDirectory(fileSystem.getPath("meu-bucket"));
 
-        Path docs = Files.createDirectory(fileSystem.getPath("docs"));
-
-        Files.write(docs.resolve("linguagens.txt"), List.of(
-                "Java",
-                "Kotlin",
-                "Scala",
-                "Groovy"
+        Path precos = Files.createDirectories(bucket.resolve("precos"));
+        Files.write(precos.resolve("2026-11-23.csv"), List.of(
+                "sku;preco",
+                "CAM-001;79.90",
+                "CAL-002;149.90"
         ), StandardCharsets.UTF_8);
 
-        // O SimpleFileServer exige um caminho absoluto
-        return docs.toAbsolutePath();
+        Path catalogo = Files.createDirectories(bucket.resolve("catalogo"));
+        Files.writeString(catalogo.resolve("produtos.json"),
+                "[{\"sku\":\"CAM-001\",\"nome\":\"Camiseta básica\"}]");
+
+        return bucket.toAbsolutePath();
     }
 }
